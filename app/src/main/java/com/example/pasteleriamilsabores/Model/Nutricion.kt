@@ -1,5 +1,6 @@
 package com.example.pasteleriamilsabores.Model
 
+//Definimos Nutricion en otro data class para dsp integrarlo a tamanio
 data class Nutricion(
     val peso: String,
     val energia: String,
