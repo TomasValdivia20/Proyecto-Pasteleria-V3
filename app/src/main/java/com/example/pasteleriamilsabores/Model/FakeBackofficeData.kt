@@ -1,6 +1,7 @@
 package com.example.pasteleriamilsabores.Model
 
 // Datos Ficticios para la simulación de ventas y gráficos
+//Después Integrar a una base de datos real
 object FakeBackofficeData {
 
     val ventasRecientes = listOf(
