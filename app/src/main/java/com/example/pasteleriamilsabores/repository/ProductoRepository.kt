@@ -5,6 +5,7 @@ import com.example.pasteleriamilsabores.Model.Producto
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
+//Repositorio de nuestros productos.json
 class ProductoRepository() {
 
     // Función para obtener TODOS los productos desde 'productos.json'
