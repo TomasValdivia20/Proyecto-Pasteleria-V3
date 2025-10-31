@@ -1,5 +1,6 @@
 package com.example.pasteleriamilsabores.Model
 
+//Usuario de BO
 data class UsuarioBackoffice(
     val id: String,
     val nombre: String,
