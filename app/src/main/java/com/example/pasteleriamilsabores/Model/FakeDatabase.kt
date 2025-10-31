@@ -1,5 +1,6 @@
 package com.example.pasteleriamilsabores.Model
 
+//Fake Data base 
 object FakeDatabase {
     private val usuarios = mutableListOf<Usuario>()
 
