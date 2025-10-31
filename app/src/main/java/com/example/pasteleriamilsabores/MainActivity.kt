@@ -22,7 +22,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.pasteleriamilsabores.ViewModel.BOViewModel
 
-//COMENTARIOPRIMERCOMMIT GITHUB
 
 // Opcional: Puedes definir tus rutas aquí para evitar "hardcode"
 
