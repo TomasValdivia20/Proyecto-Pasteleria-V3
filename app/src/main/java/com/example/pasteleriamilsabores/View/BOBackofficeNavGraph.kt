@@ -2,10 +2,12 @@ package com.example.pasteleriamilsabores.View
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -16,7 +18,7 @@ import com.example.pasteleriamilsabores.ViewModel.BOViewModel
 import com.example.pasteleriamilsabores.ViewModel.BOViewModelFactory
 import kotlinx.coroutines.launch
 
-// Clase de datos (sin cambios)
+// Clase de datos para los ítems del menú
 data class DrawerItem(val route: String, val icon: androidx.compose.ui.graphics.vector.ImageVector, val title: String)
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,16 +27,19 @@ fun BOBackofficeNavGraph(
     navController: NavController
 ) {
     val context = LocalContext.current
+    // Inyección del ViewModel con Factory
     val boViewModel: BOViewModel = viewModel(factory = BOViewModelFactory(context))
+
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val currentScreenRoute by boViewModel.currentScreen.collectAsState()
 
-    // 🛑 1. DEFINIR drawerItems UNA SOLA VEZ AQUÍ
-    val drawerItems = remember { // Usamos remember para que no se recree innecesariamente
+    // 🛑 1. DEFINIR drawerItems AQUÍ (Una única vez)
+    // Usamos remember para que la lista no se recree en cada recomposición
+    val drawerItems = remember {
         listOf(
             DrawerItem(Destinos.BODASHBOARD, Icons.Default.Dashboard, "Dashboard"),
-            DrawerItem(Destinos.BOORDENES, Icons.Default.ReceiptLong, "Órdenes"),
+            DrawerItem(Destinos.BOORDENES, Icons.AutoMirrored.Filled.ReceiptLong, "Órdenes"),
             DrawerItem(Destinos.BOPRODUCTO, Icons.Default.Cake, "Productos"),
             DrawerItem(Destinos.BOCATEGORIA, Icons.Default.Category, "Categorías"),
             DrawerItem(Destinos.BOUSUARIO, Icons.Default.People, "Usuarios"),
@@ -47,10 +52,11 @@ fun BOBackofficeNavGraph(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                // ... (Contenido del DrawerSheet usando drawerItems - sin cambios)
                 Spacer(Modifier.height(12.dp))
                 Text("Menú Backoffice", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(16.dp))
-                Divider()
+                HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
+
+                // Renderizar ítems del menú
                 drawerItems.forEach { item ->
                     NavigationDrawerItem(
                         icon = { Icon(item.icon, contentDescription = null) },
@@ -63,14 +69,17 @@ fun BOBackofficeNavGraph(
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                     )
                 }
+
                 Spacer(Modifier.weight(1f))
-                NavigationDrawerItem( // Botón Cerrar Sesión
-                    icon = { Icon(Icons.Default.ExitToApp, contentDescription = null) },
+
+                // Botón Cerrar Sesión (Menú Lateral)
+                NavigationDrawerItem(
+                    icon = { Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null) },
                     label = { Text("Cerrar Sesión") },
                     selected = false,
                     onClick = {
                         navController.navigate(Destinos.LOGIN_SCREEN) {
-                            popUpTo(Destinos.BACKOFFICE_BASE) { inclusive = true }
+                            popUpTo(0) { inclusive = true }
                         }
                     },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -83,7 +92,12 @@ fun BOBackofficeNavGraph(
                 currentScreenRoute = currentScreenRoute,
                 onMenuClick = { scope.launch { drawerState.open() } },
                 boViewModel = boViewModel,
-                drawerItems = drawerItems // <-- Pasamos la lista
+                drawerItems = drawerItems, // <-- Pasamos la lista aquí
+                onLogout = { // Callback para el botón de la barra superior
+                    navController.navigate(Destinos.LOGIN_SCREEN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
             )
         }
     )
@@ -95,7 +109,8 @@ fun BODashboardContainer(
     currentScreenRoute: String,
     onMenuClick: () -> Unit,
     boViewModel: BOViewModel,
-    drawerItems: List<DrawerItem> // <-- Recibe la lista
+    drawerItems: List<DrawerItem>, // <-- Recibe la lista
+    onLogout: () -> Unit
 ) {
     // Obtener el título usando la lista recibida
     val title = remember(currentScreenRoute, drawerItems) {
@@ -110,12 +125,20 @@ fun BODashboardContainer(
                     IconButton(onClick = onMenuClick) {
                         Icon(Icons.Default.Menu, contentDescription = "Abrir Menú")
                     }
+                },
+                actions = {
+                    IconButton(onClick = onLogout) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                            contentDescription = "Cerrar Sesión"
+                        )
+                    }
                 }
             )
         }
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
-            // El 'when' block sigue igual, llamando a las pantallas correctas
+            // Switch para mostrar la pantalla correspondiente
             when (currentScreenRoute) {
                 Destinos.BODASHBOARD -> BODashboardScreen(boViewModel)
                 Destinos.BOORDENES -> BOOrdenesScreen(boViewModel)

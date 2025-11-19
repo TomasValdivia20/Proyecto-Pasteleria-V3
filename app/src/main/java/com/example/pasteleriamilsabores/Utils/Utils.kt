@@ -8,6 +8,7 @@ fun validarCampos(
     apellido: String,
     rut: String,
     region: String,
+    comuna: String,
     direccion: String,
     email: String,
     password: String
@@ -30,6 +31,11 @@ fun validarCampos(
     // Validar Region seleccionada
     if (region.trim().isEmpty()) {
         return "Debes seleccionar una región"
+    }
+
+    // Validar Comuna seleccionada
+    if (comuna.trim().isEmpty()) {
+        return "Debes seleccionar una comuna"
     }
 
     // Validar dirección

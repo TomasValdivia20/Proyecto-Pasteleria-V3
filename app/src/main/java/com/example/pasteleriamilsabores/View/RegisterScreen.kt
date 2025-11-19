@@ -1,115 +1,81 @@
 package com.example.pasteleriamilsabores.View
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.pasteleriamilsabores.ViewModel.AuthViewModel
-//Import color de fondo al Register y icono
-import com.example.pasteleriamilsabores.ui.theme.PastelCalido
-import com.example.pasteleriamilsabores.R
-import com.example.pasteleriamilsabores.Utils.*
-import androidx.compose.material3.LocalContentColor // Para el color del icono
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-
-// Import color de fondo al Register y icono
-import androidx.compose.foundation.Image
-
+import androidx.navigation.NavController
+import com.example.pasteleriamilsabores.R
+import com.example.pasteleriamilsabores.ViewModel.AuthViewModel
+import com.example.pasteleriamilsabores.ui.theme.PastelCalido
+import com.example.pasteleriamilsabores.Model.RegionesChile
+import com.example.pasteleriamilsabores.Utils.validarCampos
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
+    // Estados (sin cambios)
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
     var rut by remember { mutableStateOf("") }
     var region by remember { mutableStateOf("") }
+    var comuna by remember { mutableStateOf("") }
     var direccion by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    // Control del menu desplegable
-    var expanded by remember { mutableStateOf(false) }
+    // Control de menús desplegables
+    var expandedRegion by remember { mutableStateOf(false) }
+    var expandedComuna by remember { mutableStateOf(false) }
 
-    // Lista de regiones de Chile
-    val regiones = listOf(
-        "Region de Arica y Parinacota",
-        "Region de Tarapaca",
-        "Region de Antofagasta",
-        "Region de Atacama",
-        "Region de Coquimbo",
-        "Region de Valparaiso",
-        "Region Metropolitana",
-        "Region del Libertador General Bernardo O'higgins",
-        "Region del Maule",
-        "Region del Ñuble",
-        "Region del Biobio",
-        "Region de La Araucania",
-        "Region de Los Rios",
-        "Region de Los Lagos",
-        "Region de Aysen",
-        "Region de Magallanes y la Antartica Chilena"
-    )
+    // Lógica de filtrado de comunas
+    val comunasDisponibles = RegionesChile.comunasPorRegion[region] ?: emptyList()
 
-// 1. Contenedor Box para el fondo y el icono 🎨
     Box(
         modifier = Modifier
             .fillMaxSize()
-            // Aplicamos el color de fondo PastelCalido
             .background(PastelCalido)
-            .padding(all = 20.dp)
+            .padding(20.dp)
     ) {
-        // 2. Icono de marca en la esquina superior derecha (TopEnd)
+        // Logo (sin cambios)
         Image(
-            // **IMPORTANTE**: Reemplaza 'R.drawable.logo_pasteleria_mil_sabores' con el ID real de tu imagen
-            painter = painterResource(id = R.drawable.logo ), // Cambiado a tu logo
+            painter = painterResource(id = R.drawable.logo),
             contentDescription = "Logo de Pastelería Mil Sabores",
             modifier = Modifier
-                .align(Alignment.TopEnd) // Posiciona en la esquina superior derecha
-                .padding(top = 16.dp, end = 16.dp) // Pequeño margen
-                .size(120.dp) // Ajusta el tamaño según sea necesario para tu logo
+                .align(Alignment.TopEnd)
+                .padding(top = 16.dp, end = 16.dp)
+                .size(120.dp)
         )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(all = 20.dp),
-            verticalArrangement = Arrangement.Center
+                .padding(20.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Registro", style = MaterialTheme.typography.titleLarge)
+            Spacer(Modifier.height(80.dp))
 
+            Text(text = "¡Registrate!", style = MaterialTheme.typography.headlineMedium)
+            Spacer(Modifier.height(16.dp))
+
+            // Campos de texto (Nombre, Apellido, RUT - sin cambios)
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
                 label = { Text("Nombre") },
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = apellido,
@@ -117,53 +83,97 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                 label = { Text("Apellido") },
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = rut,
                 onValueChange = { rut = it },
-                label = { Text("Rut (12345678-9)") },
+                label = { Text("RUT (12345678-9)") },
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(Modifier.height(8.dp))
 
-            // ComboBox (DropDown) para region
+            // --- SELECTOR DE REGIÓN (CORREGIDO) ---
             ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded }
+                expanded = expandedRegion,
+                onExpandedChange = { expandedRegion = !expandedRegion },
+                modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
                     value = region,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Region") },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                    },
+                    label = { Text("Región") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedRegion) },
                     modifier = Modifier
-                        .menuAnchor()
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
                         .fillMaxWidth()
                 )
                 ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                    expanded = expandedRegion,
+                    onDismissRequest = { expandedRegion = false }
                 ) {
-                    regiones.forEach { opcion ->
+                    RegionesChile.regiones.forEach { regionItem ->
                         DropdownMenuItem(
-                            text = { Text(opcion) },
+                            text = { Text(regionItem) },
                             onClick = {
-                                region = opcion
-                                expanded = false
+                                region = regionItem
+                                comuna = ""
+                                expandedRegion = false
                             }
                         )
                     }
                 }
             }
+            Spacer(Modifier.height(8.dp))
 
+            // --- SELECTOR DE COMUNA (CORREGIDO) ---
+            ExposedDropdownMenuBox(
+                expanded = expandedComuna,
+                onExpandedChange = { expandedComuna = !expandedComuna },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = comuna,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Comuna") },
+                    placeholder = { Text(if (region.isEmpty()) "Seleccione Región primero" else "Seleccione Comuna") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedComuna) },
+                    modifier = Modifier
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, region.isNotEmpty())
+                        .fillMaxWidth(),
+                    enabled = region.isNotEmpty()
+                )
+                ExposedDropdownMenu(
+                    expanded = expandedComuna,
+                    onDismissRequest = { expandedComuna = false }
+                ) {
+                    if (comunasDisponibles.isEmpty()) {
+                        DropdownMenuItem(text = { Text("No hay comunas disponibles") }, onClick = {})
+                    } else {
+                        comunasDisponibles.forEach { comunaItem ->
+                            DropdownMenuItem(
+                                text = { Text(comunaItem) },
+                                onClick = {
+                                    comuna = comunaItem
+                                    expandedComuna = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+
+            // Campos restantes (Dirección, Email, Password, Botones - sin cambios)
             OutlinedTextField(
                 value = direccion,
                 onValueChange = { direccion = it },
-                label = { Text("Direccion") },
+                label = { Text("Dirección (Calle y Número)") },
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = email,
@@ -171,6 +181,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = password,
@@ -180,15 +191,36 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                 visualTransformation = PasswordVisualTransformation()
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
+            // Botón Registrar
             Button(
                 onClick = {
-                    val error = validarCampos(nombre, apellido, rut, region, direccion, email, password )
+                    val error = validarCampos(
+                        nombre = nombre,
+                        apellido = apellido,
+                        rut = rut,
+                        region = region,
+                        comuna = comuna,
+                        direccion = direccion,
+                        email = email,
+                        password = password
+                    )
+
                     if (error != null) {
-                        viewModel.mensaje.value=error
+                        viewModel.mensaje.value = error
                     } else {
-                        viewModel.registrar(nombre, apellido, rut, region, direccion, email, password)
+                        viewModel.registrar(
+                            nombre = nombre,
+                            apellido = apellido,
+                            rut = rut,
+                            region = region,
+                            comuna = comuna,
+                            direccion = direccion,
+                            email = email,
+                            pass = password
+                        )
+                        navController.navigate("login")
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -196,13 +228,19 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                 Text("Registrar")
             }
 
-            Text(
-                text = viewModel.mensaje.value,
-                modifier = Modifier.padding(top = 10.dp)
-            )
+            if (viewModel.mensaje.value.isNotEmpty()) {
+                Text(
+                    text = viewModel.mensaje.value,
+                    color = if (viewModel.mensaje.value == "Registro exitoso ") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+            }
 
             TextButton(onClick = { navController.navigate("login") }) {
-                Text("¿Ya tienes cuenta? Inicia sesion")
+                Text("¿Ya tienes cuenta? Inicia sesión")
             }
+
+            Spacer(Modifier.height(24.dp))
         }
-    }}
+    }
+}

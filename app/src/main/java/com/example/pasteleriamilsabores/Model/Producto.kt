@@ -1,6 +1,5 @@
 package com.example.pasteleriamilsabores.Model
 
-//Llamamos la clase tamanio
 data class Producto(
     val id: Int,
     val nombre: String,

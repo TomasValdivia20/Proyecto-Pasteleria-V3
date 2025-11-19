@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.alpha
 // Para carrito
 import com.example.pasteleriamilsabores.ViewModel.CartViewModel
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.FabPosition
 import com.example.pasteleriamilsabores.ui.theme.Amarillo
@@ -155,11 +156,29 @@ fun HomeScreen(
             // TopBar
             topBar = {
                 TopAppBar(
-                    title = { Text("Bienvenido, ${email ?: "Pastelería"} - Categorías") },
+                    title = { Text("Bienvenido, ${email ?: "Pastelería"}") },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary
-                    )
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                        actionIconContentColor = MaterialTheme.colorScheme.onPrimary // Color para el icono
+                    ),
+                    // Botón Logout
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                // Navegar al Login y limpiar TODA la pila
+                                navController.navigate(Destinos.LOGIN_SCREEN) {
+                                    popUpTo(0) { inclusive = true } // Borra todo el historial
+                                }
+                            }
+                        ) {
+                            // Icono de puerta/salida
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                contentDescription = "Cerrar Sesión"
+                            )
+                        }
+                    }
                 )
             },
 

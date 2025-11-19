@@ -1,53 +1,22 @@
 package com.example.pasteleriamilsabores.View
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.pasteleriamilsabores.ViewModel.AuthViewModel
-//Import color de fondo al Register y icono
-import com.example.pasteleriamilsabores.ui.theme.PastelCalido
-import com.example.pasteleriamilsabores.R
-import com.example.pasteleriamilsabores.Utils.*
-import androidx.compose.material3.LocalContentColor // Para el color del icono
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-
-// Import color de fondo al Register y icono
-import androidx.compose.foundation.Image
-import androidx.compose.material3.OutlinedButton
-
+import androidx.navigation.NavController
+import com.example.pasteleriamilsabores.R
+import com.example.pasteleriamilsabores.ViewModel.AuthViewModel
+import com.example.pasteleriamilsabores.ui.theme.PastelCalido
 import com.example.pasteleriamilsabores.Destinos
 
-
-
-@OptIn(ExperimentalMaterial3Api::class) // Necesario para OutlinedTextField, etc. si usas M3
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
     var email by remember { mutableStateOf("") }
@@ -57,7 +26,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
         modifier = Modifier
             .fillMaxSize()
             .background(PastelCalido)
-            .padding(20.dp) // Padding general para el Box
+            .padding(20.dp)
     ) {
         Image(
             painter = painterResource(id = R.drawable.logo),
@@ -68,74 +37,75 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                 .size(120.dp)
         )
 
-        // --- COLUMNA PRINCIPAL QUE CENTRA EL CONTENIDO ---
         Column(
             modifier = Modifier
-                .fillMaxSize() // Ocupa todo el espacio disponible
-                .padding(horizontal = 20.dp), // Padding horizontal para los campos
-            verticalArrangement = Arrangement.Center, // Centra verticalmente el contenido
-            horizontalAlignment = Alignment.CenterHorizontally // Centra horizontalmente los botones
+                .fillMaxSize()
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 "Inicio de Sesión",
-                style = MaterialTheme.typography.headlineMedium, // Un poco más grande
-                modifier = Modifier.padding(bottom = 24.dp) // Más espacio abajo
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(bottom = 24.dp)
             )
 
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth() // Ocupa todo el ancho
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(12.dp)) // Espacio entre campos
+            Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth() // Ocupa todo el ancho
+                modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(20.dp)) // Más espacio antes del botón
+            Spacer(modifier = Modifier.height(20.dp))
 
             // Botón Principal "Entrar"
             Button(
                 onClick = {
-                    if (viewModel.login(email, password)) {
-                        // Navega limpiando la pila hasta el inicio (si es necesario)
-                        navController.navigate("home/$email") {
-                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                    // LÓGICA DE LOGIN Y REDIRECCIÓN
+                    val usuarioLogueado = viewModel.login(email, password)
+
+                    if (usuarioLogueado != null) {
+                        // Verificación de dominio para Backoffice
+                        // Si el correo termina en @milsabores.cl -> Es empleado/admin
+                        if (email.endsWith("@milsabores.cl")) {
+                            navController.navigate(Destinos.BACKOFFICE_BASE) {
+                                popUpTo(Destinos.REGISTER_SCREEN) { inclusive = true }
+                            }
+                        } else {
+                            // Cualquier otro dominio -> Es cliente -> Va al Home
+                            navController.navigate("home/$email") {
+                                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                            }
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth(0.8f) // Botón un poco más estrecho
+                modifier = Modifier.fillMaxWidth(0.8f)
             ) {
                 Text("Entrar")
             }
 
-            // Mensaje de feedback del ViewModel
-            Text(
-                viewModel.mensaje.value,
-                modifier = Modifier.padding(top = 10.dp),
-                color = MaterialTheme.colorScheme.error // Usar color de error si aplica
-            )
-
-            // 🛑 BOTÓN DE ACCESO EMPLEADOS
-            Spacer(Modifier.height(24.dp)) // Más espacio antes del botón secundario
-            OutlinedButton(
-                onClick = {
-                    navController.navigate(Destinos.BACKOFFICE_BASE) {
-                        popUpTo(Destinos.REGISTER_SCREEN) { inclusive = true }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(0.8f) // Mismo ancho que el botón "Entrar"
-            ) {
-                Text("Acceso Empleados (Backoffice)")
+            // Mensaje de feedback
+            if (viewModel.mensaje.value.isNotEmpty()) {
+                Text(
+                    viewModel.mensaje.value,
+                    modifier = Modifier.padding(top = 10.dp),
+                    color = MaterialTheme.colorScheme.error
+                )
             }
-            // ----------------------------------------------------
+
+            TextButton(onClick = { navController.navigate(Destinos.REGISTER_SCREEN) }) {
+                Text("¿No tienes cuenta? Regístrate")
+            }
         }
     }
 }
-

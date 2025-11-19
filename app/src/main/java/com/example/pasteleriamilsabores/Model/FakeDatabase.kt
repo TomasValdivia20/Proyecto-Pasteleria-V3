@@ -1,17 +1,28 @@
 package com.example.pasteleriamilsabores.Model
 
-//Fake Data base
-//Despues integraremos una base de datos real
 object FakeDatabase {
-    private val usuarios = mutableListOf<Usuario>()
-
-    fun registrar(usuario: Usuario): Boolean {
-        if (usuarios.any { it.email == usuario.email }) return false
-        usuarios.add(usuario)
-        return true
-    }
-
-    fun login(email: String, password: String): Boolean {
-        return usuarios.any { it.email == email && it.password == password }
-    }
+    val usuarios: MutableList<Usuario> = mutableListOf(
+        Usuario(
+            id = 1,
+            nombre = "Juan Carlos",
+            apellido = "Bodoque",
+            email = "juan@gmail.com",
+            password = "123",
+            direccion = "Calle Falsa 123",
+            rut = "12345678-9",
+            region = "Metropolitana",
+            comuna = "Santiago"
+        ),
+        Usuario(
+            id = 2,
+            nombre = "Admin",
+            apellido = "User",
+            email = "admin@milsabores.cl",
+            password = "admin",
+            direccion = "Oficina Central 1",
+            rut = "98765432-1",
+            region = "Metropolitana",
+            comuna = "Providencia"
+        )
+    )
 }

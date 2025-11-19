@@ -5,7 +5,6 @@ import com.example.pasteleriamilsabores.Model.Categoria
 import com.google.gson.Gson // Necesitarás la librería Gson para parsear JSON
 import com.google.gson.reflect.TypeToken
 
-
 class CategoriaRepository() {
 
     fun obtenerCategoriasDesdeAssets(context: Context, filename: String = "data/categorias.json"): List<Categoria> {
